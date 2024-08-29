@@ -1,0 +1,41 @@
+# fusion_retrieval.py
+
+import numpy as np
+
+class FusionRetrieval:
+    def __init__(self):
+        self.vector_store = {}
+        self.keyword_index = {}
+    
+    def add_document(self, doc_id, content, vector):
+        self.vector_store[doc_id] = vector
+        words = content.lower().split()
+        for word in words:
+            if word not in self.keyword_index:
+                self.keyword_index[word] = set()
+            self.keyword_index[word].add(doc_id)
+    
+    def vector_search(self, query_vector):
+        # Implement vector similarity search
+        scores = {doc_id: np.dot(query_vector, doc_vector) 
+                  for doc_id, doc_vector in self.vector_store.items()}
+        return sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    
+    def keyword_search(self, query):
+        query_words = query.lower().split()
+        results = set.intersection(*[self.keyword_index.get(word, set()) for word in query_words])
+        return list(results)
+    
+    def fuse_results(self, vector_results, keyword_results):
+        # Combine and re-rank results
+        fused_scores = {}
+        for doc_id, score in vector_results:
+            fused_scores[doc_id] = score
+        for doc_id in keyword_results:
+            fused_scores[doc_id] = fused_scores.get(doc_id, 0) + 1
+        return sorted(fused_scores.items(), key=lambda x: x[1], reverse=True)
+
+    def retrieve(self, query, query_vector):
+        vector_results = self.vector_search(query_vector)
+        keyword_results = self.keyword_search(query)
+        return self.fuse_results(vector_results, keyword_results)

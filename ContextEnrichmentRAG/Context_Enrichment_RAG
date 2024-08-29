@@ -1,0 +1,20 @@
+# context_enrichment.py
+
+class ContextEnrichment:
+    def __init__(self):
+        self.document_store = {}
+    
+    def add_document(self, doc_id, content):
+        self.document_store[doc_id] = content
+    
+    def retrieve_chunk(self, chunk_id):
+        # Retrieve specific chunk from document store
+        pass
+    
+    def enrich_context(self, chunk):
+        # Add surrounding context to the retrieved chunk
+        pass
+    
+    def process_query(self, query):
+        # Retrieve and enrich relevant chunks
+        pass

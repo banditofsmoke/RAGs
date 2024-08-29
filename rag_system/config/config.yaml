@@ -1,0 +1,23 @@
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  password: datARsec6
+  dbname: rag_db  # Make sure this database exists
+
+embeddings:
+  model: sentence-transformers/all-MiniLM-L6-v2
+  dimension: 384
+
+document_processing:
+  chunk_size: 1000
+  chunk_overlap: 200
+
+llm:
+  model: phi3.5
+
+retriever:
+  top_k: 5
+
+rag:
+  max_tokens: 2000
