@@ -53,7 +53,7 @@ class DocumentProcessor:
                         id TEXT PRIMARY KEY,
                         content TEXT NOT NULL,
                         source TEXT NOT NULL,
-                        metadata JSONB
+                        metadata JSONB #TODO: Add columns for hash, creation date, last modified, double check
                     )
                 """)
                 cur.execute("""
@@ -63,7 +63,7 @@ class DocumentProcessor:
                         content TEXT NOT NULL,
                         chunk_index INTEGER NOT NULL,
                         embedding VECTOR(384)
-                    )
+                    ) #TODO: Add meta data to chunk index column. chunk hash, creation data, last modified 
                 """)
                 cur.execute("""
                     CREATE INDEX IF NOT EXISTS idx_chunks_document_id ON chunks (document_id)
@@ -89,7 +89,7 @@ class DocumentProcessor:
             length_function=len,
         )
         chunks = text_splitter.create_documents([document], [metadata])
-        return chunks
+        return chunks #TODO: Loop over chunks, add chunk ID and chunk hash 
 
     def add_document_and_chunks(self, document: str, source: str, metadata: Dict):
         try:
@@ -109,7 +109,7 @@ class DocumentProcessor:
                     INSERT INTO chunks (id, document_id, content, chunk_index, embedding)
                     VALUES (%s, %s, %s, %s, %s)
                     ON CONFLICT (id) DO NOTHING
-                """, chunk_data)
+                """, chunk_data) #TODO: Add the json of the metadata in a new column 
             self.conn.commit()
             logging.info(f"Document {document_id} and its chunks added successfully")
             return document_id
@@ -146,6 +146,7 @@ class DocumentProcessor:
             text = ''
             for page in pdf_reader.pages:
                 text += page.extract_text()
+                #TODO: Method should return document with metadata, that contains page number, and hash of the page
         return text
 
     def process_file(self, file_path: str) -> List[Document]:
@@ -158,6 +159,7 @@ class DocumentProcessor:
             raise ValueError(f"Unsupported file type: {file_path}")
         
         return self.chunk_document(text, {"source": file_path})
+        #TODO: add the meta datas hash of the file
 
     def build_rag(self, company_name: str):
         if not os.path.exists("./.cache"):
